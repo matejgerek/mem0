@@ -18,6 +18,8 @@ export interface EmbeddingConfig {
   url?: string;
   embeddingDims?: number;
   modelProperties?: Record<string, any>;
+  baseURL?: string;
+  headers?: Record<string, string>;
 }
 
 export interface VectorStoreConfig {
@@ -46,6 +48,7 @@ export interface LLMConfig {
   model?: string | any;
   modelProperties?: Record<string, any>;
   reasoningEffort?: "minimal" | "low" | "medium" | "high";
+  headers?: Record<string, string>;
 }
 
 export interface Neo4jConfig {
@@ -120,6 +123,7 @@ export const MemoryConfigSchema = z.object({
       apiKey: z.string().optional(),
       model: z.union([z.string(), z.any()]).optional(),
       baseURL: z.string().optional(),
+      headers: z.record(z.string(), z.string()).optional(),
     }),
   }),
   vectorStore: z.object({
@@ -140,6 +144,7 @@ export const MemoryConfigSchema = z.object({
       modelProperties: z.record(z.string(), z.any()).optional(),
       baseURL: z.string().optional(),
       reasoningEffort: z.enum(["minimal", "low", "medium", "high"]).optional(),
+      headers: z.record(z.string(), z.string()).optional(),
     }),
   }),
   historyDbPath: z.string().optional(),

@@ -27,10 +27,15 @@ export class ConfigManager {
                 : defaultConf.apiKey,
             model: finalModel,
             url: userConf?.url,
+            baseURL: userConf?.baseURL || (defaultConf as any)?.baseURL,
             modelProperties:
               userConf?.modelProperties !== undefined
                 ? userConf.modelProperties
                 : defaultConf.modelProperties,
+            headers:
+              (userConf as any)?.headers !== undefined
+                ? (userConf as any).headers
+                : (defaultConf as any)?.headers,
           };
         })(),
       },
@@ -90,6 +95,14 @@ export class ConfigManager {
               userConf?.modelProperties !== undefined
                 ? userConf.modelProperties
                 : defaultConf.modelProperties,
+            reasoningEffort:
+              (userConf as any)?.reasoningEffort !== undefined
+                ? (userConf as any).reasoningEffort
+                : (defaultConf as any)?.reasoningEffort,
+            headers:
+              (userConf as any)?.headers !== undefined
+                ? (userConf as any).headers
+                : (defaultConf as any)?.headers,
           };
         })(),
       },

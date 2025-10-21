@@ -8,9 +8,13 @@ export class OpenAILLM implements LLM {
   private reasoningEffort?: "minimal" | "low" | "medium" | "high";
 
   constructor(config: LLMConfig) {
+    const defaultHeaders =
+      (config as any).headers ||
+      (config.modelProperties?.headers as Record<string, string> | undefined);
     this.openai = new OpenAI({
       apiKey: config.apiKey,
       baseURL: config.baseURL,
+      ...(defaultHeaders && { defaultHeaders }),
     });
     this.model = config.model || "gpt-4.1-nano-2025-04-14";
     // prefer top-level config.reasoningEffort, fallback to modelProperties.reasoningEffort

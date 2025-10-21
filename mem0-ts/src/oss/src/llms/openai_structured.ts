@@ -8,7 +8,14 @@ export class OpenAIStructuredLLM implements LLM {
   private reasoningEffort?: "minimal" | "low" | "medium" | "high";
 
   constructor(config: LLMConfig) {
-    this.openai = new OpenAI({ apiKey: config.apiKey });
+    const defaultHeaders =
+      (config as any).headers ||
+      (config.modelProperties?.headers as Record<string, string> | undefined);
+    this.openai = new OpenAI({
+      apiKey: config.apiKey,
+      baseURL: config.baseURL,
+      ...(defaultHeaders && { defaultHeaders }),
+    });
     this.model = config.model || "gpt-4-turbo-preview";
     this.reasoningEffort =
       (config as any).reasoningEffort ||
