@@ -5,10 +5,25 @@ import { LLMConfig, Message } from "../types";
 export class OpenAIStructuredLLM implements LLM {
   private openai: OpenAI;
   private model: string;
+  private reasoningEffort?: "minimal" | "low" | "medium" | "high";
 
   constructor(config: LLMConfig) {
     this.openai = new OpenAI({ apiKey: config.apiKey });
     this.model = config.model || "gpt-4-turbo-preview";
+    this.reasoningEffort =
+      (config as any).reasoningEffort ||
+      (config.modelProperties?.reasoningEffort as
+        | "minimal"
+        | "low"
+        | "medium"
+        | "high"
+        | undefined);
+  }
+
+  private normalizeReasoningEffort(): "low" | "medium" | "high" | undefined {
+    if (!this.reasoningEffort) return undefined;
+    if (this.reasoningEffort === "minimal") return "low";
+    return this.reasoningEffort;
   }
 
   async generateResponse(
@@ -16,6 +31,7 @@ export class OpenAIStructuredLLM implements LLM {
     responseFormat?: { type: string } | null,
     tools?: any[],
   ): Promise<string | LLMResponse> {
+    const normalizedReasoningEffort = this.normalizeReasoningEffort();
     const completion = await this.openai.chat.completions.create({
       messages: messages.map((msg) => ({
         role: msg.role as "system" | "user" | "assistant",
@@ -25,6 +41,9 @@ export class OpenAIStructuredLLM implements LLM {
             : JSON.stringify(msg.content),
       })),
       model: this.model,
+      ...(normalizedReasoningEffort && {
+        reasoning_effort: normalizedReasoningEffort,
+      }),
       ...(tools
         ? {
             tools: tools.map((tool) => ({
@@ -63,6 +82,7 @@ export class OpenAIStructuredLLM implements LLM {
   }
 
   async generateChat(messages: Message[]): Promise<LLMResponse> {
+    const normalizedReasoningEffort = this.normalizeReasoningEffort();
     const completion = await this.openai.chat.completions.create({
       messages: messages.map((msg) => ({
         role: msg.role as "system" | "user" | "assistant",
@@ -72,6 +92,9 @@ export class OpenAIStructuredLLM implements LLM {
             : JSON.stringify(msg.content),
       })),
       model: this.model,
+      ...(normalizedReasoningEffort && {
+        reasoning_effort: normalizedReasoningEffort,
+      }),
     });
     const response = completion.choices[0].message;
     return {
