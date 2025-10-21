@@ -45,6 +45,7 @@ export interface LLMConfig {
   apiKey?: string;
   model?: string | any;
   modelProperties?: Record<string, any>;
+  reasoningEffort?: "minimal" | "low" | "medium" | "high";
 }
 
 export interface Neo4jConfig {
@@ -138,6 +139,7 @@ export const MemoryConfigSchema = z.object({
       model: z.union([z.string(), z.any()]).optional(),
       modelProperties: z.record(z.string(), z.any()).optional(),
       baseURL: z.string().optional(),
+      reasoningEffort: z.enum(["minimal", "low", "medium", "high"]).optional(),
     }),
   }),
   historyDbPath: z.string().optional(),
