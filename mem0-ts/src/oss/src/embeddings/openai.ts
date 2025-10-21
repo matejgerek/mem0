@@ -8,7 +8,14 @@ export class OpenAIEmbedder implements Embedder {
   private embeddingDims?: number;
 
   constructor(config: EmbeddingConfig) {
-    this.openai = new OpenAI({ apiKey: config.apiKey });
+    const defaultHeaders =
+      (config as any).headers ||
+      (config.modelProperties?.headers as Record<string, string> | undefined);
+    this.openai = new OpenAI({
+      apiKey: config.apiKey,
+      baseURL: config.baseURL,
+      ...(defaultHeaders && { defaultHeaders }),
+    });
     this.model = config.model || "text-embedding-3-small";
     this.embeddingDims = config.embeddingDims || 1536;
   }
